@@ -259,21 +259,44 @@ main {
 .tempo-readout {
   position: relative;
   z-index: 1;
+  cursor: text;
 }
 
-.tempo-readout output {
+.tempo-readout input {
   display: block;
+  width: 3.3ch;
+  padding: 2px 4px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--text);
+  background: transparent;
   font-size: clamp(4rem, 16vw, 6.6rem);
   font-weight: 760;
-  line-height: 0.86;
+  line-height: 0.92;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.075em;
+  text-align: center;
   text-shadow: 0 2px 30px rgba(114, 232, 245, 0.16);
+  caret-color: var(--cyan);
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+
+.tempo-readout input:hover {
+  border-color: rgba(114, 232, 245, 0.22);
+  background: rgba(10, 17, 32, 0.28);
+}
+
+.tempo-readout input:focus,
+.tempo-readout input:focus-visible {
+  outline: none;
+  border-color: rgba(114, 232, 245, 0.72);
+  background: rgba(10, 17, 32, 0.52);
+  box-shadow: 0 0 0 3px rgba(114, 232, 245, 0.16);
 }
 
 .tempo-readout span {
   display: block;
-  margin-top: 12px;
+  margin-top: 10px;
   color: var(--cyan);
   font-size: 0.72rem;
   font-weight: 760;

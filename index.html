@@ -43,10 +43,18 @@
 
           <h1 id="tempoHeading" class="sr-only">节拍速度</h1>
           <div id="tempoOrbit" class="tempo-orbit">
-            <div class="tempo-readout" aria-live="polite" aria-atomic="true">
-              <output id="tempoNumber">100</output>
+            <label class="tempo-readout" for="tempoNumber">
+              <input
+                id="tempoNumber"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="3"
+                value="100"
+                aria-label="直接输入速度 BPM（20 至 320）"
+              />
               <span>BPM</span>
-            </div>
+            </label>
             <div class="orbit-tick tick-1"></div>
             <div class="orbit-tick tick-2"></div>
             <div class="orbit-tick tick-3"></div>
@@ -61,7 +69,7 @@
             </label>
             <button class="tempo-step" type="button" data-tempo-step="1" aria-label="提高 1 BPM">+</button>
           </div>
-          <p class="tempo-helper"><span id="tempoName">Andante</span><span aria-hidden="true">·</span><span>轻触滑杆可精调</span></p>
+          <p class="tempo-helper"><span id="tempoName">Andante</span><span aria-hidden="true">·</span><span>点击数字可直接输入，或拖动滑杆精调</span></p>
 
           <div class="transport-row">
             <button id="playButton" class="play-button" type="button" aria-pressed="false">
