@@ -1,4 +1,4 @@
-const CACHE_NAME = "pulsekeeper-v2";
+const CACHE_NAME = "pulsekeeper-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -12,7 +12,15 @@ self.addEventListener("install", function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function (cache) {
-        return cache.addAll(APP_SHELL);
+        return Promise.all(
+          APP_SHELL.map(function (url) {
+            return fetch(new Request(url, { cache: "reload" })).then(function (response) {
+              if (response.ok) {
+                return cache.put(url, response);
+              }
+            });
+          })
+        );
       })
       .then(function () {
         return self.skipWaiting();
@@ -44,20 +52,18 @@ self.addEventListener("fetch", function (event) {
   }
 
   event.respondWith(
-    caches.match(event.request).then(function (cachedResponse) {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then(function (networkResponse) {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== "basic") {
-          return networkResponse;
+    fetch(event.request)
+      .then(function (networkResponse) {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === "basic") {
+          const responseCopy = networkResponse.clone();
+          caches.open(CACHE_NAME).then(function (cache) {
+            cache.put(event.request, responseCopy);
+          });
         }
-        const responseCopy = networkResponse.clone();
-        caches.open(CACHE_NAME).then(function (cache) {
-          cache.put(event.request, responseCopy);
-        });
         return networkResponse;
-      });
-    })
+      })
+      .catch(function () {
+        return caches.match(event.request);
+      })
   );
 });
