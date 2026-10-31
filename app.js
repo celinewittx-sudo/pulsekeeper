@@ -175,7 +175,6 @@ function renderPattern() {
 
 function renderControls() {
   el.tempoNumber.value = String(state.bpm);
-  el.tempoNumber.textContent = String(state.bpm);
   el.tempoRange.value = String(state.bpm);
   setRangeProgress(el.tempoRange, MIN_BPM, MAX_BPM);
   el.tempoName.textContent = getTempoName(state.bpm);
@@ -488,10 +487,12 @@ function toggleMetronome() {
   }
 }
 
-function setBpm(value) {
+function setBpm(value, options) {
+  const skipNumberInput = options && options.skipNumberInput;
   state.bpm = clamp(Math.round(Number(value) || state.bpm), MIN_BPM, MAX_BPM);
-  el.tempoNumber.value = String(state.bpm);
-  el.tempoNumber.textContent = String(state.bpm);
+  if (!skipNumberInput) {
+    el.tempoNumber.value = String(state.bpm);
+  }
   el.tempoRange.value = String(state.bpm);
   el.tempoName.textContent = getTempoName(state.bpm);
   setRangeProgress(el.tempoRange, MIN_BPM, MAX_BPM);
@@ -500,6 +501,15 @@ function setBpm(value) {
   if (isPlaying) {
     resyncTransport();
   }
+}
+
+function commitTempoInput() {
+  const raw = el.tempoNumber.value.replace(/\D+/g, "");
+  if (raw === "") {
+    el.tempoNumber.value = String(state.bpm);
+    return;
+  }
+  setBpm(Number(raw));
 }
 
 function resizeAccents() {
@@ -563,6 +573,50 @@ function setupEvents() {
     button.addEventListener("click", function () {
       setBpm(state.bpm + Number(button.dataset.tempoStep));
     });
+  });
+
+  el.tempoOrbit.addEventListener("click", function (event) {
+    if (event.target !== el.tempoNumber) {
+      el.tempoNumber.focus();
+      el.tempoNumber.select();
+    }
+  });
+
+  el.tempoNumber.addEventListener("focus", function () {
+    el.tempoNumber.select();
+  });
+
+  el.tempoNumber.addEventListener("input", function () {
+    const cleaned = el.tempoNumber.value.replace(/\D+/g, "").slice(0, 3);
+    if (el.tempoNumber.value !== cleaned) {
+      el.tempoNumber.value = cleaned;
+    }
+    const parsed = Number(cleaned);
+    if (cleaned !== "" && parsed >= MIN_BPM && parsed <= MAX_BPM) {
+      setBpm(parsed, { skipNumberInput: true });
+    }
+  });
+
+  el.tempoNumber.addEventListener("blur", commitTempoInput);
+
+  el.tempoNumber.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      commitTempoInput();
+      el.tempoNumber.blur();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      el.tempoNumber.value = String(state.bpm);
+      el.tempoNumber.blur();
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setBpm(state.bpm + 1);
+      el.tempoNumber.select();
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setBpm(state.bpm - 1);
+      el.tempoNumber.select();
+    }
   });
 
   el.tempoRange.addEventListener("input", function () {

@@ -1,4 +1,4 @@
-const CACHE_NAME = "pulsekeeper-v1";
+const CACHE_NAME = "pulsekeeper-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
