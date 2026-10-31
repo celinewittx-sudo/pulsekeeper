@@ -775,8 +775,18 @@ function setupInstall() {
 
 function setupServiceWorker() {
   if ("serviceWorker" in navigator) {
+    let refreshing = false;
+    const hadController = Boolean(navigator.serviceWorker.controller);
+
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (hadController && !refreshing && !isPlaying) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
+
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js").catch(function () {
+      navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).catch(function () {
         // Offline install is an enhancement; the normal page should remain usable.
       });
     });
