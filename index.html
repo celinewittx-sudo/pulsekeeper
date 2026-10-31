@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#111a2e" />
+    <meta name="description" content="一个可离线安装、适合安卓端使用的专业节拍器。" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/app-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icons/app-icon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Pulsekeeper 节拍器</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="Pulsekeeper 节拍器首页">
+          <span class="brand-mark" aria-hidden="true"><i></i><b></b></span>
+          <span>
+            <strong>Pulsekeeper</strong>
+            <small>专业练习节拍器</small>
+          </span>
+        </a>
+
+        <div class="topbar-actions">
+          <button id="installButton" class="icon-button is-hidden" type="button" aria-label="安装应用" title="安装应用">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg>
+          </button>
+          <button id="fullscreenButton" class="icon-button" type="button" aria-label="切换全屏" title="切换全屏">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V5h4m8 0h4v4M20 15v4h-4M8 19H4v-4"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="tempoHeading">
+          <div class="session-label">
+            <span class="status-dot" id="statusDot" aria-hidden="true"></span>
+            <span id="transportStatus">准备就绪</span>
+            <span aria-hidden="true">·</span>
+            <span id="meterSummary">4 / 4</span>
+          </div>
+
+          <h1 id="tempoHeading" class="sr-only">节拍速度</h1>
+          <div id="tempoOrbit" class="tempo-orbit">
+            <div class="tempo-readout" aria-live="polite" aria-atomic="true">
+              <output id="tempoNumber">100</output>
+              <span>BPM</span>
+            </div>
+            <div class="orbit-tick tick-1"></div>
+            <div class="orbit-tick tick-2"></div>
+            <div class="orbit-tick tick-3"></div>
+            <div class="orbit-tick tick-4"></div>
+          </div>
+
+          <div class="tempo-controls">
+            <button class="tempo-step" type="button" data-tempo-step="-1" aria-label="降低 1 BPM">−</button>
+            <label class="range-wrap" for="tempoRange">
+              <span class="sr-only">速度，BPM</span>
+              <input id="tempoRange" type="range" min="20" max="320" value="100" />
+            </label>
+            <button class="tempo-step" type="button" data-tempo-step="1" aria-label="提高 1 BPM">+</button>
+          </div>
+          <p class="tempo-helper"><span id="tempoName">Andante</span><span aria-hidden="true">·</span><span>轻触滑杆可精调</span></p>
+
+          <div class="transport-row">
+            <button id="playButton" class="play-button" type="button" aria-pressed="false">
+              <span class="play-symbol" aria-hidden="true"></span>
+              <span id="playButtonLabel">开始</span>
+            </button>
+            <button id="tapButton" class="tap-button" type="button">
+              <span>Tap</span>
+              <small>点按定速</small>
+            </button>
+          </div>
+          <p id="transportHint" class="transport-hint">点击开始，允许浏览器播放节拍声。</p>
+        </section>
+
+        <div class="content-grid">
+          <section class="panel rhythm-panel" aria-labelledby="rhythmTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">RHYTHM</p>
+                <h2 id="rhythmTitle">节奏编组</h2>
+              </div>
+              <span class="panel-chip" id="subdivisionLabel">每拍 1 音</span>
+            </div>
+
+            <div class="field-grid">
+              <label class="select-field">
+                <span>拍号上数</span>
+                <select id="beatsPerBar" aria-label="每小节拍数">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4" selected>4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                  <option value="11">11</option>
+                  <option value="12">12</option>
+                </select>
+              </label>
+              <label class="select-field">
+                <span>拍号下数</span>
+                <select id="beatUnit" aria-label="拍号下数">
+                  <option value="2">2</option>
+                  <option value="4" selected>4</option>
+                  <option value="8">8</option>
+                  <option value="16">16</option>
+                </select>
+              </label>
+              <label class="select-field field-wide">
+                <span>细分</span>
+                <select id="subdivision" aria-label="每拍细分">
+                  <option value="1" selected>无细分（每拍 1 音）</option>
+                  <option value="2">八分音符（每拍 2 音）</option>
+                  <option value="3">三连音（每拍 3 音）</option>
+                  <option value="4">十六分音符（每拍 4 音）</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="swing-row">
+              <div>
+                <span class="control-title">Swing</span>
+                <small>仅作用于二等分</small>
+              </div>
+              <label class="compact-range" for="swingRange">
+                <input id="swingRange" type="range" min="0" max="66" value="0" />
+                <output id="swingValue">0%</output>
+              </label>
+            </div>
+
+            <div class="pattern-header">
+              <div>
+                <span class="control-title">重音型</span>
+                <small>点击拍点切换：常规 → 重音 → 静音</small>
+              </div>
+              <span class="legend"><i class="accent-dot"></i>重音 <i class="mute-dot"></i>静音</span>
+            </div>
+            <div id="beatPattern" class="beat-pattern" role="group" aria-label="节拍重音型"></div>
+          </section>
+
+          <section class="panel sound-panel" aria-labelledby="soundTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">SOUND</p>
+                <h2 id="soundTitle">声音与练习</h2>
+              </div>
+              <span class="panel-chip">本机保存</span>
+            </div>
+
+            <div class="sound-picker" role="group" aria-label="节拍音色">
+              <button type="button" class="sound-choice" data-sound="wood">木质</button>
+              <button type="button" class="sound-choice" data-sound="digital">电子</button>
+              <button type="button" class="sound-choice" data-sound="bell">铃音</button>
+            </div>
+
+            <label class="volume-row" for="volumeRange">
+              <span>
+                <span class="control-title">音量</span>
+                <small id="volumeValue">78%</small>
+              </span>
+              <input id="volumeRange" type="range" min="0" max="100" value="78" />
+            </label>
+
+            <div class="practice-grid">
+              <label class="toggle-row" for="hapticToggle">
+                <span>
+                  <span class="control-title">触觉反馈</span>
+                  <small>强拍时轻微振动</small>
+                </span>
+                <input id="hapticToggle" type="checkbox" />
+                <span class="toggle-ui" aria-hidden="true"></span>
+              </label>
+              <label class="select-field">
+                <span>静音练习</span>
+                <select id="muteEvery" aria-label="静音练习模式">
+                  <option value="0">关闭</option>
+                  <option value="2">每 2 小节静音 1 小节</option>
+                  <option value="4">每 4 小节静音 1 小节</option>
+                  <option value="8">每 8 小节静音 1 小节</option>
+                </select>
+              </label>
+            </div>
+          </section>
+        </div>
+
+        <section class="presets" aria-labelledby="presetsTitle">
+          <div class="presets-title">
+            <div>
+              <p class="eyebrow">QUICK START</p>
+              <h2 id="presetsTitle">快速练习</h2>
+            </div>
+            <p>选择一个起点，之后可以继续微调。</p>
+          </div>
+          <div class="preset-list">
+            <button class="preset-card" type="button" data-preset="warmup" data-bpm="72" data-beats="4" data-unit="4" data-subdivision="1">
+              <strong>热身</strong><span>72 BPM · 4/4</span>
+            </button>
+            <button class="preset-card" type="button" data-preset="groove" data-bpm="96" data-beats="4" data-unit="4" data-subdivision="2" data-swing="20">
+              <strong>律动</strong><span>96 BPM · 八分 Swing</span>
+            </button>
+            <button class="preset-card" type="button" data-preset="waltz" data-bpm="120" data-beats="3" data-unit="4" data-subdivision="1">
+              <strong>圆舞曲</strong><span>120 BPM · 3/4</span>
+            </button>
+            <button class="preset-card" type="button" data-preset="precision" data-bpm="60" data-beats="4" data-unit="4" data-subdivision="4">
+              <strong>精度</strong><span>60 BPM · 十六分</span>
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <span>Pulsekeeper 不需要帐号，设置会保存在这台设备上。</span>
+        <span>空格键可开始 / 停止</span>
+      </footer>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>

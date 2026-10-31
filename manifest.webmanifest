@@ -1,0 +1,20 @@
+{
+  "name": "Pulsekeeper 专业节拍器",
+  "short_name": "Pulsekeeper",
+  "description": "可离线安装的专业练习节拍器，支持细分、重音、Swing 与静音练习。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#111a2e",
+  "background_color": "#0c1324",
+  "icons": [
+    {
+      "src": "icons/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
